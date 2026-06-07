@@ -1,7 +1,5 @@
 import * as z from 'zod'
 
-const APP_DOMAIN = 'localhost:3000'
-
 export const createLinkSchema = z.object({
     originalUrl: z.preprocess(
         (val) => {
@@ -31,7 +29,7 @@ export const createLinkSchema = z.object({
 }).superRefine((data, ctx) => {
     try {
         const urlObj = new URL(data.originalUrl)
-        if (urlObj.host === APP_DOMAIN) {
+        if (urlObj.host === Bun.env.APP_DOMAIN) {
             ctx.addIssue({
                 code: 'custom',
                 message: 'You cannot shorten URLs belonging to this service!',
