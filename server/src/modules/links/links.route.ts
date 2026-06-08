@@ -1,6 +1,6 @@
 import { Hono } from "hono"
 import { sValidator } from "@hono/standard-validator"
-import { createLinkSchema } from "./links.schema"
+import { linkSchema } from "./links.schema"
 import { linksService } from "./links.service"
 import { UAParser } from "ua-parser-js"
 import { getConnInfo } from "hono/bun"
@@ -9,7 +9,7 @@ import { analyticsService } from "../analytics/analytics.service"
 const app = new Hono()
 
 const linkRoutes = app
-    .post('/', sValidator('json', createLinkSchema), async (c) => {
+    .post('/', sValidator('json', linkSchema), async (c) => {
         const payload = c.req.valid('json')
 
         const newLink = await linksService.createShortUrl(payload)

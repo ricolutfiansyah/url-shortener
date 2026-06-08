@@ -1,6 +1,6 @@
 import * as z from 'zod'
 
-export const createLinkSchema = z.object({
+export const linkSchema = z.object({
     originalUrl: z.preprocess(
         (val) => {
             if (typeof val === 'string') {
@@ -42,4 +42,4 @@ export const createLinkSchema = z.object({
     }
 })
 
-export type CreateLinkSchema = z.infer<typeof createLinkSchema>
+export type LinkSchema = z.infer<typeof linkSchema>
