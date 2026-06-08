@@ -5,6 +5,7 @@ import {
     uuid,
     pgEnum
 } from 'drizzle-orm/pg-core'
+import { relations } from 'drizzle-orm'
 
 export const roleEnum = pgEnum('role', ['user', 'admin'])
 
@@ -14,6 +15,14 @@ export const users = pgTable('users', {
     email: text('email').notNull().unique(),
     password: text('password').notNull(),
     role: roleEnum('role').default('user').notNull(),
+    createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+})
+
+export const sessions = pgTable('sessions', {
+    id: uuid('id').defaultRandom().primaryKey(),
+    userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
+    refreshToken: text('refresh_token').notNull(),
+    expiresAt: timestamp('expires_at', { mode: 'date' }).notNull(),
     createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
 })
 
@@ -37,3 +46,10 @@ export const clicks = pgTable('clicks', {
     browser: text('browser'),
     clickedAt: timestamp('clicked_at', { mode: 'date' }).defaultNow().notNull(),
 })
+
+export const sessionRelations = relations(sessions, ({ one }) => ({
+    user: one(users, {
+        fields: [sessions.userId],
+        references: [users.id],
+    }),
+}))
