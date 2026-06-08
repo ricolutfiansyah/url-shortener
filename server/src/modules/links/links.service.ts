@@ -14,6 +14,7 @@ export const linksService = {
             shortCode,
             userId: data.userId || null,
             title: data.title || 'Untitled url',
+            expiresAt: data.expiresAt,
         }).returning()
 
         return newLink

@@ -30,6 +30,10 @@ const linkRoutes = app
             return c.text('URL not found or deleted!', 404)
         }
 
+        if (link.expiresAt && new Date() > link.expiresAt) {
+            return c.text('URL has expired!', 410)
+        }
+
         const userAgentString = c.req.header('User-Agent') || ''
         const ipAddress = c.req.header('x-forwarded-for')?.split(',')[0].trim() || getConnInfo(c).remote.address
 
@@ -46,8 +50,8 @@ const linkRoutes = app
             browser: browserName,
         }).catch(err => console.error('Failed to track click!', err))
 
-        // Run tracking in background, doesn't wait for it to finish
         try {
+            // Run tracking in background, doesn't wait for it to finish
             c.executionCtx.waitUntil(trackingPromise)
         } catch {
             // No execution context, promise runs in background natively

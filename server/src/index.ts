@@ -1,6 +1,6 @@
 import { Hono } from 'hono'
 import { logger } from 'hono/logger'
-import linkRoutes from './modules/links/links.routes'
+import linkRoutes from './modules/links/links.route'
 import analyticsRoutes from './modules/analytics/analytics.route'
 
 const app = new Hono()

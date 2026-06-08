@@ -26,6 +26,7 @@ export const createLinkSchema = z.object({
         .max(50, 'Title must be at most 50 characters long.')
         .optional(),
     userId: z.string().optional(),
+    expiresAt: z.coerce.date().optional(),
 }).superRefine((data, ctx) => {
     try {
         const urlObj = new URL(data.originalUrl)
