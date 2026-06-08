@@ -2,10 +2,11 @@ import db from "../../db/client"
 import { links } from "../../db/schema"
 import { eq } from "drizzle-orm"
 import { nanoid } from "nanoid"
-import type { CreateLinkSchema } from "./links.schema"
+import type { LinkSchema } from "./links.schema"
+import { HTTPException } from "hono/http-exception"
 
 export const linksService = {
-    async createShortUrl(data: CreateLinkSchema) {
+    async createShortUrl(data: LinkSchema) {
 
         let shortCode = nanoid(8)
 
@@ -27,6 +28,14 @@ export const linksService = {
             .from(links)
             .where(eq(links.shortCode, shortCode))
             .limit(1)
+
+        if (!link) {
+            throw new HTTPException(404, { message: 'Link not found' })
+        }
+
+        if (link.expiresAt && link.expiresAt < new Date()) {
+            throw new HTTPException(410, { message: 'This link has expired' })
+        }
 
         return link
     }
