@@ -7,7 +7,6 @@ import {
 } from 'solid-js';
 import { useNavigate } from '@solidjs/router';
 import { client } from '../lib/api';
-import { set } from 'zod';
 
 const fetchLinks = async () => {
   const res = await client.api.links.$get();

@@ -7,6 +7,7 @@ import './index.css';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Home from './pages/Home';
+import Stats from './pages/Stats';
 
 const root = document.getElementById('root');
 
@@ -21,7 +22,8 @@ render(
     <Router>
       <Route path="/" component={Home} />
       <Route path="/login" component={Login} />
-      <Route path="dashboard" component={Dashboard} />
+      <Route path="/dashboard" component={Dashboard} />
+      <Route path="/stats/:id" component={Stats} />
     </Router>
   ),
   root!,

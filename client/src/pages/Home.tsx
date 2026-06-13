@@ -4,6 +4,7 @@ import { client } from '../lib/api';
 export default function Home() {
   const [url, setUrl] = createSignal('');
   const [shortUrl, setShortUrl] = createSignal('');
+  const [linkId, setLinkId] = createSignal('');
   const [isLoading, setIsLoading] = createSignal(false);
   const [error, setError] = createSignal('');
 
@@ -25,6 +26,8 @@ export default function Home() {
       }
 
       setShortUrl(`http://localhost:3000/api/links/${data.data.shortCode}`);
+      setLinkId(data.data.id);
+      setUrl('');
     } catch (err) {
       setError('An error occurred while shortening the URL');
     } finally {
@@ -71,7 +74,7 @@ export default function Home() {
             Paste the URL to be shortened
           </h1>
           <p class="text-lg text-gray-500 mb-8">
-            ShortLink is a free tool to shorten URLs and generate short links.
+            ShortLink is a free tool to shorten URLs and generate short links
           </p>
 
           <form
@@ -90,7 +93,7 @@ export default function Home() {
             <button
               type="submit"
               class="bg-blue-600 hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold text-lg py-4 px-8 rounded-
-  xl transition-colors whitespace-nowrap shadow-md"
+  xl transition-colors whitespace-nowrap shadow-md cursor-pointer"
               disabled={isLoading()}
             >
               {isLoading() ? '...' : 'Shorten URL'}
@@ -122,6 +125,27 @@ export default function Home() {
                   Copy
                 </button>
               </div>
+              <a
+                href={`/stats/${linkId()}`}
+                target="_blank"
+                class="text-sm text-blue-600 hover:text-blue-800 underline flex items-center justify-center gap-1"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M3 3v18h18" />
+                  <path d="m19 9-5 5-4-4-3 3" />
+                </svg>
+                View Analytics for this link
+              </a>
             </div>
           </Show>
         </div>
