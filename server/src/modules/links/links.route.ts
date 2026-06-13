@@ -1,15 +1,25 @@
 import { Hono } from "hono"
-import { sValidator } from "@hono/standard-validator"
+import { validate } from "../../middlewares/validate"
 import { linkSchema } from "./links.schema"
 import { linksService } from "./links.service"
 import { UAParser } from "ua-parser-js"
 import { getConnInfo } from "hono/bun"
 import { analyticsService } from "../analytics/analytics.service"
+import { authMiddleware, requireAdmin } from "../../middlewares/auth"
 
 const app = new Hono()
 
 const linkRoutes = app
-    .post('/', sValidator('json', linkSchema), async (c) => {
+    .get('/', authMiddleware, requireAdmin, async (c) => {
+        const links = await linksService.getAllLinks()
+
+        return c.json({
+            success: true,
+            message: 'All links fetched successfully!',
+            data: links
+        })
+    })
+    .post('/', validate('json', linkSchema), async (c) => {
         const payload = c.req.valid('json')
 
         const newLink = await linksService.createShortUrl(payload)

@@ -1,4 +1,5 @@
 import { Hono } from 'hono'
+import { HTTPException } from 'hono/http-exception'
 import { logger } from 'hono/logger'
 import { cors } from 'hono/cors'
 import linkRoutes from './modules/links/links.route'
@@ -15,6 +16,22 @@ app.use('*', cors({
   credentials: true,
   maxAge: 60 * 60 * 24
 }))
+
+app.onError((err, c) => {
+  console.error(`${err}`);
+
+  if (err instanceof HTTPException) {
+    return c.json({
+      success: false,
+      message: err.message,
+    }, err.status)
+  }
+
+  return c.json({
+    success: false,
+    message: 'Internal Server Error'
+  }, 500)
+})
 
 app.get('/', (c) => {
   return c.text('Welcome to URL Shortener!')

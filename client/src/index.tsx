@@ -1,8 +1,10 @@
 /* @refresh reload */
 import { render } from 'solid-js/web';
+import { Router, Route } from '@solidjs/router';
 import 'solid-devtools';
 
-import App from './App';
+import Login from './pages/Login';
+import Dashboard from './pages/Dashboard';
 
 const root = document.getElementById('root');
 
@@ -12,4 +14,10 @@ if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
   );
 }
 
-render(() => <App />, root!);
+render(() => (
+  <Router>
+    <Route path='' component={() => <div>Welcome! Go to /login or /dashboard</div>} />
+    <Route path='/login' component={Login} />
+    <Route path='dashboard' component={Dashboard} />
+  </Router>
+), root!);

@@ -38,5 +38,37 @@ export const linksService = {
         }
 
         return link
+    },
+
+    async getAllLinks() {
+        const allLinks = await db.query.links.findMany()
+        return allLinks
+    },
+
+    async getUserLinks(userId: string) {
+        const userLinks = await db.query.links.findMany({
+            where: eq(links.userId, userId)
+        })
+        return userLinks
+    },
+
+    async updateLink(linkId: string, data: LinkSchema) {
+        const [updatedLink] = await db.update(links).set({
+            originalUrl: data.originalUrl,
+            title: data.title || 'Untitled url',
+            expiresAt: data.expiresAt,
+        }).where(eq(links.id, linkId)).returning()
+
+        if (!updatedLink) {
+            throw new HTTPException(404, { message: 'Link not found' })
+        }
+
+        return updatedLink
+    },
+
+    async deleteLink(linkId: string) {
+        await db.delete(links).where(eq(links.id, linkId))
+
+        return
     }
 }

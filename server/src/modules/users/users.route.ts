@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { authMiddleware } from "../../middlewares/auth";
 import { AppVariables } from "../../types";
 import { userService } from "./users.service";
-import { sValidator } from "@hono/standard-validator";
+import { validate } from "../../middlewares/validate";
 import { userSchema } from "./users.schema";
 import { getCookie, setCookie, deleteCookie } from "hono/cookie";
 
@@ -22,13 +22,6 @@ const userRouter = app
         const payload = c.get('jwtPayload')
         const userId = payload.sub
 
-        if (!userId) {
-            return c.json({
-                success: false,
-                message: 'User not found!',
-            }, 404)
-        }
-
         const user = await userService.getMe(userId)
 
         return c.json({
@@ -37,7 +30,7 @@ const userRouter = app
             data: user
         })
     })
-    .post('/register', sValidator('json', userSchema), async (c) => {
+    .post('/register', validate('json', userSchema), async (c) => {
         const body = c.req.valid('json')
 
         const user = await userService.userRegister(body)
@@ -48,7 +41,7 @@ const userRouter = app
             data: user
         }, 201)
     })
-    .post('/login', sValidator('json', userSchema), async (c) => {
+    .post('/login', validate('json', userSchema), async (c) => {
         const body = c.req.valid('json')
 
         const { user, accessToken, refreshToken } = await userService.userLogin(body)
