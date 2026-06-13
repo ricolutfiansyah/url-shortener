@@ -6,6 +6,7 @@
     "esModuleInterop": true,
     "moduleResolution": "bundler",
     "module": "esnext",
-    "target": "esnext"
+    "target": "esnext",
+    "types": ["bun"]
   }
 }

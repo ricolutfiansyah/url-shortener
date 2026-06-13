@@ -2,9 +2,11 @@
 import { render } from 'solid-js/web';
 import { Router, Route } from '@solidjs/router';
 import 'solid-devtools';
+import './index.css';
 
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
+import Home from './pages/Home';
 
 const root = document.getElementById('root');
 
@@ -14,10 +16,13 @@ if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
   );
 }
 
-render(() => (
-  <Router>
-    <Route path='' component={() => <div>Welcome! Go to /login or /dashboard</div>} />
-    <Route path='/login' component={Login} />
-    <Route path='dashboard' component={Dashboard} />
-  </Router>
-), root!);
+render(
+  () => (
+    <Router>
+      <Route path="/" component={Home} />
+      <Route path="/login" component={Login} />
+      <Route path="dashboard" component={Dashboard} />
+    </Router>
+  ),
+  root!,
+);

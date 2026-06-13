@@ -36,10 +36,6 @@ const linkRoutes = app
 
         const link = await linksService.getOriginalUrl(code)
 
-        if (!link) {
-            return c.text('URL not found or deleted!', 404)
-        }
-
         if (link.expiresAt && new Date() > link.expiresAt) {
             return c.text('URL has expired!', 410)
         }

@@ -23,7 +23,7 @@ export const analyticsService = {
         const [totalClickResult] = await db
             .select({ total: count() })
             .from(clicks)
-            .where(eq(clicks.id, linkId))
+            .where(eq(clicks.linkId, linkId))
 
         const totalClicks = totalClickResult?.total || 0
 
