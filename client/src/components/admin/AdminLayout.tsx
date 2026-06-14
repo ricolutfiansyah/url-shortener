@@ -49,7 +49,7 @@ export default function AdminLayout(props: { children?: JSX.Element }) {
           </A>
         </nav>
         <div class="p-4 border-t border-border">
-          <Button variant="ghost" class="w-full justify-start text-muted-foreground hover:text-foreground" onClick={handleLogout}>
+          <Button variant="ghost" class="w-full justify-start text-muted-foreground hover:text-foreground cursor-pointer" onClick={handleLogout}>
             Logout
           </Button>
         </div>

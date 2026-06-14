@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { authMiddleware } from "../../middlewares/auth";
+import { authMiddleware, requireAdmin } from "../../middlewares/auth";
 import { AppVariables } from "../../types";
 import { userService } from "./users.service";
 import { validate } from "../../middlewares/validate";
@@ -9,7 +9,7 @@ import { getCookie, setCookie, deleteCookie } from "hono/cookie";
 const app = new Hono<{ Variables: AppVariables }>()
 
 const userRouter = app
-    .get('/', authMiddleware, async (c) => {
+    .get('/', requireAdmin, authMiddleware, async (c) => {
         const users = await userService.getAllUsers()
 
         return c.json({
@@ -18,7 +18,7 @@ const userRouter = app
             data: users
         })
     })
-    .get('/me', authMiddleware, async (c) => {
+    .get('/me', authMiddleware, requireAdmin, async (c) => {
         const payload = c.get('jwtPayload')
         const userId = payload.sub
 
@@ -79,7 +79,7 @@ const userRouter = app
             accessToken
         })
     })
-    .post('/logout', authMiddleware, async (c) => {
+    .post('/logout', authMiddleware, requireAdmin, async (c) => {
         const incomingRefreshToken = getCookie(c, 'refresh_token')
 
         if (!incomingRefreshToken) {

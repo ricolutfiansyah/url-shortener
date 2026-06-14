@@ -7,7 +7,6 @@ import { getConnInfo } from "hono/bun"
 import { analyticsService } from "../analytics/analytics.service"
 import { authMiddleware, requireAdmin } from "../../middlewares/auth"
 import { HTTPException } from "hono/http-exception"
-import { links } from "../../db/schema"
 
 const app = new Hono()
 
@@ -46,11 +45,11 @@ const linkRoutes = app
         return c.json({
             success: true,
             message: 'Link stats fetched successfully!',
-            data : {
+            data: {
                 originalUrl: link.originalUrl,
                 expires_at: link.expiresAt,
             }
-        }) 
+        })
     })
     .get('/:code', async (c) => {
         const code = c.req.param('code')
@@ -58,7 +57,7 @@ const linkRoutes = app
         const link = await linksService.getOriginalUrl(code)
 
         if (link.expiresAt && new Date() > link.expiresAt) {
-            throw new HTTPException(410, {message: 'URL has expired!'})
+            throw new HTTPException(410, { message: 'URL has expired!' })
         }
 
         const userAgentString = c.req.header('User-Agent') || ''
