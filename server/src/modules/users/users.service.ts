@@ -21,7 +21,7 @@ export const userService = {
             name: user.name,
             email: user.email,
             password: hashedPassword,
-            role: 'admin'
+            role: 'user'
         }).returning()
 
         return { user: newUser }
