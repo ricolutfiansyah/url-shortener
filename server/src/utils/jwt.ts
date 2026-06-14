@@ -13,7 +13,7 @@ export const generateAccessToken = async (userId: string, role: string) => {
 export const generateRefreshToken = async (userId: string) => {
     const payload = {
         sub: userId,
-        exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24 * 7),
+        exp: Math.floor(Date.now() / 1000) + (7 * 24 * 60 * 60),
     }
 
     return await sign(payload, Bun.env.JWT_REFRESH_SECRET!)

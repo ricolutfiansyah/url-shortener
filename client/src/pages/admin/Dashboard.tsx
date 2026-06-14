@@ -137,17 +137,22 @@ export default function Dashboard() {
                       <th class="px-6 py-3 font-medium">Title</th>
                       <th class="px-6 py-3 font-medium">Short URL</th>
                       <th class="px-6 py-3 font-medium hidden md:table-cell">Original URL</th>
-                      <th class="px-6 py-3 font-medium text-right">Actions</th>
+                      <th class="px-6 py-3 font-medium">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     <For each={links()}>
                       {(link) => (
                         <tr class="bg-card border-b border-border hover:bg-muted/30 transition-colors">
-                          <td class="px-6 py-4 font-medium text-foreground">
-                            {link.title || 'Untitled'}
+                          <td class="px-4 py-4">
+                            <div class="font-medium text-foreground">
+                              {link.title || 'Untitled'}
+                            </div>
+                            <div class="text-xs text-muted-foreground truncate max-w-[150px] sm:max-w-[250px] md:hidden mt-1" title={link.originalUrl}>
+                              {link.originalUrl}
+                            </div>
                           </td>
-                          <td class="px-6 py-4">
+                          <td class="px-4 py-4">
                             <a
                               href={`http://localhost:3000/api/links/${link.shortCode}`}
                               target="_blank"
@@ -156,10 +161,10 @@ export default function Dashboard() {
                               {link.shortCode}
                             </a>
                           </td>
-                          <td class="px-6 py-4 text-muted-foreground truncate max-w-xs hidden md:table-cell" title={link.originalUrl}>
+                          <td class="px-4 py-4 text-muted-foreground truncate max-w-[200px] lg:max-w-xs hidden md:table-cell" title={link.originalUrl}>
                             {link.originalUrl}
                           </td>
-                          <td class="px-6 py-4 text-right">
+                          <td class="px-4 py-4">
                             <A href={`/dashboard/analytics/${link.id}`}>
                               <Button variant="secondary" size="sm" class="cursor-pointer">
                                 Analytics
