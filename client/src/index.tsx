@@ -4,10 +4,13 @@ import { Router, Route } from '@solidjs/router';
 import 'solid-devtools';
 import './index.css';
 
-import Login from './pages/Login';
-import Dashboard from './pages/Dashboard';
-import Home from './pages/Home';
-import Stats from './pages/Stats';
+import Layout from './components/Layout';
+import Login from './pages/auth/Login';
+import Dashboard from './pages/admin/Dashboard';
+import Home from './pages/user/Home';
+import Track from './pages/user/Track';
+import Unshorten from './pages/user/Unshorten';
+import Stats from './pages/user/Stats';
 
 const root = document.getElementById('root');
 
@@ -20,10 +23,14 @@ if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
 render(
   () => (
     <Router>
-      <Route path="/" component={Home} />
+      <Route component={Layout}>
+        <Route path="/" component={Home} />
+        <Route path="/track" component={Track} />
+        <Route path="/unshorten" component={Unshorten} />
+        <Route path="/stats/:id" component={Stats} />
+      </Route>
       <Route path="/login" component={Login} />
       <Route path="/dashboard" component={Dashboard} />
-      <Route path="/stats/:id" component={Stats} />
     </Router>
   ),
   root!,

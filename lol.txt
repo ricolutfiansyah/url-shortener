@@ -1,47 +1,4 @@
-import { createSignal, Show } from 'solid-js';
-import { client } from '../lib/api';
-
-export default function Home() {
-  const [url, setUrl] = createSignal('');
-  const [shortUrl, setShortUrl] = createSignal('');
-  const [linkId, setLinkId] = createSignal('');
-  const [isLoading, setIsLoading] = createSignal(false);
-  const [error, setError] = createSignal('');
-
-  const handleShorten = async (e: Event) => {
-    e.preventDefault();
-    setError('');
-    setIsLoading(true);
-    setShortUrl('');
-
-    try {
-      const res = await client.api.links.$post({
-        json: { originalUrl: url() },
-      });
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.message || 'Failed to shorten URL');
-        return;
-      }
-
-      setShortUrl(`http://localhost:3000/api/links/${data.data.shortCode}`);
-      setLinkId(data.data.id);
-      setUrl('');
-    } catch (err) {
-      setError('An error occurred while shortening the URL');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(shortUrl());
-    alert('Short URL copied to clipboard!');
-  };
-
-  return (
-    <div class="min-h-screen bg-gray-50 font-sans flex flex-col">
+<div class="min-h-screen bg-gray-50 font-sans flex flex-col">
       {/* 1. Simple Navbar */}
       <nav class="w-full bg-white border-b border-gray-200 py-4 px-8">
         <div class="max-w-6xl mx-auto flex items-center justify-between">
@@ -77,31 +34,43 @@ export default function Home() {
             ShortLink is a free tool to shorten URLs and generate short links
           </p>
 
-          <form
-            onSubmit={handleShorten}
-            class="flex flex-col sm:flex-row gap-3"
-          >
-            <input
-              type="url"
-              class="w-full bg-white border border-gray-300 text-gray-900 rounded-xl px-5 py-4 text-lg outline-none focus:border-blue-600 focus:ring-4
-  focus:ring-blue-600/15 transition-all placeholder:text-gray-400 shadow-inner"
-              placeholder="Enter the link here (https://...)"
-              value={url()}
-              onInput={(e) => setUrl(e.currentTarget.value)}
-              required
-            />
+          <form onSubmit={handleShorten} class="flex flex-col gap-4">
+            <div class="flex flex-col sm:flex-row gap-4">
+              <input
+                type="url"
+                class="grow bg-white border border-gray-200 text-gray-900 rounded-xl px-5 py-4 text-lg outline-none focus:border-blue-600
+  focus:ring-4 focus:ring-blue-600/15 transition-all placeholder:text-gray-400"
+                placeholder="Paste your long URL here... (https://)"
+                value={url()}
+                onInput={(e) => setUrl(e.currentTarget.value)}
+                required
+              />
+
+              <select
+                class="sm:w-48 bg-white border border-gray-200 text-gray-900 rounded-xl px-4 py-4 text-base outline-none focus:border-blue-600
+  focus:ring-4 focus:ring-blue-600/15 transition-all cursor-pointer"
+                value={expireOption()}
+                onChange={(e) => setExpireOption(e.currentTarget.value)}
+              >
+                <option value="never">Never Expire</option>
+                <option value="1h">Expire in 1 Hour</option>
+                <option value="24h">Expire in 24 Hours</option>
+                <option value="7d">Expire in 7 Days</option>
+              </select>
+            </div>
+
             <button
               type="submit"
-              class="bg-blue-600 hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold text-lg py-4 px-8 rounded-
-  xl transition-colors whitespace-nowrap shadow-md cursor-pointer"
-              disabled={isLoading()}
+              class="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold text-lg py-4 px-6
+  rounded-xl transition-colors flex items-center justify-center cursor-pointer"
+              disabled={isShortening()}
             >
-              {isLoading() ? '...' : 'Shorten URL'}
+              {isShortening() ? 'Shortening...' : 'Shorten URL'}
             </button>
           </form>
 
-          <Show when={error()}>
-            <p class="text-red-500 font-medium mt-6">{error()}</p>
+          <Show when={shortenError()}>
+            <p class="text-red-500 font-medium mt-6">{shortenError()}</p>
           </Show>
 
           <Show when={shortUrl()}>
@@ -234,5 +203,3 @@ export default function Home() {
         © {new Date().getFullYear()} ShortLink. Built with SolidJS & Hono.
       </footer>
     </div>
-  );
-}
