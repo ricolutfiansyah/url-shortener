@@ -1,7 +1,7 @@
 /* @refresh reload */
 import { render } from 'solid-js/web';
 import { Router, Route } from '@solidjs/router';
-import ProtectedRoute from './components/PotectedRoute';
+import ProtectedRoute from './components/admin/ProtectedRoute';
 import 'solid-devtools';
 import './index.css';
 

@@ -5,7 +5,7 @@ import {
   Show,
   createSignal,
 } from 'solid-js';
-import { useNavigate, A } from '@solidjs/router';
+import { A } from '@solidjs/router';
 import { client } from '../../lib/api';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
@@ -23,12 +23,6 @@ const fetchLinks = async () => {
 };
 
 export default function Dashboard() {
-  const navigate = useNavigate();
-
-  if (!localStorage.getItem('accessToken')) {
-    navigate('/login', { replace: true });
-  }
-
   const [links, { refetch }] = createResource(fetchLinks);
 
   const [originalUrl, setOriginalUrl] = createSignal('');

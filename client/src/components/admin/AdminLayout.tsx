@@ -3,6 +3,8 @@ import { A, useNavigate } from '@solidjs/router';
 import { Button } from '../ui/Button';
 import { client } from '../../lib/api';
 
+import { setAccessToken } from '../../store/auth';
+
 const fetchUser = async () => {
   const res = await client.api.users['me'].$get();
   const data = await res.json();
@@ -19,8 +21,13 @@ export default function AdminLayout(props: { children?: JSX.Element }) {
 
   const [user] = createResource(fetchUser);
 
-  const handleLogout = () => {
-    localStorage.removeItem('accessToken');
+  const handleLogout = async () => {
+    try {
+      await client.api.users.logout.$post();
+    } catch (error) {
+      console.error(error);
+    }
+    setAccessToken(null);
     navigate('/login', { replace: true });
   };
 

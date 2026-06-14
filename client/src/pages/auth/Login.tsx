@@ -1,6 +1,7 @@
 import { createSignal, Show } from 'solid-js';
 import { useNavigate } from '@solidjs/router';
 import { client } from '../../lib/api';
+import { setAccessToken } from '../../store/auth';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
@@ -34,14 +35,14 @@ export default function Login() {
       }
 
       if (!data.success) {
-        setError('Login failed');
+        setError(data.message || 'Login failed');
         return;
       }
 
-      localStorage.setItem('accessToken', data.accessToken);
+      setAccessToken(data.accessToken);
       navigate('/dashboard');
     } catch (error) {
-      console.log(error);
+      console.error(error);
       setError('A network error occurred. Is the backend running?');
     } finally {
       setIsLoading(false);

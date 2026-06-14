@@ -1,15 +1,22 @@
-import { createSignal } from "solid-js";
+import { createSignal } from 'solid-js';
+import { client } from '../lib/api';
 
-const initialToken = localStorage.getItem('accessToken');
+export const [accessToken, setAccessToken] = createSignal<string | null>(null);
+export const [isAuthLoading, setIsAuthLoading] = createSignal<boolean>(true);
 
-export const [accessToken, setAccessToken] = createSignal(initialToken);
-
-export const loginUser = (token: string) => {
-    localStorage.setItem('accessToken', token);
-    setAccessToken(token)
-}
-
-export const logoutUser = () => {
-    localStorage.removeItem('accessToken');
-    setAccessToken(null);
-}
+export const initializeAuth = async () => {
+    setIsAuthLoading(true);
+    try {
+        const res = await client.api.users.refresh.$post();
+        if (res.ok) {
+            const data = await res.json();
+            if (data.success && data.accessToken) {
+                setAccessToken(data.accessToken);
+            }
+        }
+    } catch (error) {
+        setAccessToken(null);
+    } finally {
+        setIsAuthLoading(false);
+    }
+};

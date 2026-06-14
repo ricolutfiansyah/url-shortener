@@ -1,10 +1,12 @@
 import { hc } from 'hono/client';
 import type { AppType } from '../../../server/src/index';
+import { accessToken, setAccessToken } from '../store/auth';
 
 export const client = hc<AppType>('http://localhost:3000', {
     fetch: async (input: RequestInfo | URL, requestInit?: RequestInit) => {
         const getFetchConfig = () => {
-            const token = localStorage.getItem('accessToken');
+            // Read from the global signal instead of localStorage
+            const token = accessToken();
 
             const headers = new Headers(requestInit?.headers);
             if (token) {
@@ -16,8 +18,8 @@ export const client = hc<AppType>('http://localhost:3000', {
 
         let response = await fetch(input, getFetchConfig());
 
+        // Extract the URL string safely
         let urlStr = '';
-
         if (typeof input === 'string') {
             urlStr = input;
         } else if (input instanceof URL) {
@@ -26,9 +28,8 @@ export const client = hc<AppType>('http://localhost:3000', {
             urlStr = input.url;
         }
 
-        const isAuthRequest = !urlStr.includes('/login') && !urlStr.includes('/refresh')
-
-        if (response.status === 401 && isAuthRequest) {
+        // Only attempt to refresh if the 401 didn't come from /login or /refresh
+        if (response.status === 401 && !urlStr.includes('/login') && !urlStr.includes('/refresh')) {
             try {
                 const refreshRes = await fetch('http://localhost:3000/api/users/refresh', {
                     method: 'POST',
@@ -38,8 +39,8 @@ export const client = hc<AppType>('http://localhost:3000', {
                 if (refreshRes.ok) {
                     const refreshData = await refreshRes.json();
                     if (refreshData.success && refreshData.accessToken) {
-                        localStorage.setItem('accessToken', refreshData.accessToken);
-
+                        // Store in signal instead of localStorage
+                        setAccessToken(refreshData.accessToken);
                         response = await fetch(input, getFetchConfig());
                     } else {
                         throw new Error('Refresh failed');
@@ -48,7 +49,7 @@ export const client = hc<AppType>('http://localhost:3000', {
                     throw new Error('Refresh failed');
                 }
             } catch (error) {
-                localStorage.removeItem('accessToken');
+                setAccessToken(null);
                 window.location.href = '/login';
             }
         }
