@@ -33,7 +33,7 @@ export const userService = {
         })
 
         if (!existUser) {
-            throw new HTTPException(404, { message: 'User not found' })
+            throw new HTTPException(404, { message: 'Invalid credentials' })
         }
 
         const isPasswordValid = await Bun.password.verify(user.password, existUser.password)

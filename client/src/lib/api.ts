@@ -16,7 +16,19 @@ export const client = hc<AppType>('http://localhost:3000', {
 
         let response = await fetch(input, getFetchConfig());
 
-        if (response.status === 401) {
+        let urlStr = '';
+
+        if (typeof input === 'string') {
+            urlStr = input;
+        } else if (input instanceof URL) {
+            urlStr = input.toString();
+        } else {
+            urlStr = input.url;
+        }
+
+        const isAuthRequest = !urlStr.includes('/login') && !urlStr.includes('/refresh')
+
+        if (response.status === 401 && isAuthRequest) {
             try {
                 const refreshRes = await fetch('http://localhost:3000/api/users/refresh', {
                     method: 'POST',

@@ -1,10 +1,11 @@
 import { Hono } from "hono";
 import { analyticsService } from "./analytics.service";
+import { authMiddleware, requireAdmin } from "../../middlewares/auth";
 
 const app = new Hono()
 
 const analyticsRoutes = app
-    .get('/:linkId', async (c) => {
+    .get('/:linkId', authMiddleware, requireAdmin, async (c) => {
         const linkId = c.req.param('linkId')
 
         if (!linkId) {

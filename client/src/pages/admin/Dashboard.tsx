@@ -5,8 +5,11 @@ import {
   Show,
   createSignal,
 } from 'solid-js';
-import { useNavigate } from '@solidjs/router';
+import { useNavigate, A } from '@solidjs/router';
 import { client } from '../../lib/api';
+import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
+import { Button } from '../../components/ui/Button';
+import { Input } from '../../components/ui/Input';
 
 const fetchLinks = async () => {
   const res = await client.api.links.$get();
@@ -64,147 +67,129 @@ export default function Dashboard() {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('accessToken');
-    navigate('/login', { replace: true });
-  };
-
   return (
-    <div style={{ padding: '2rem', 'max-width': '800px', margin: '0 auto' }}>
-      <div
-        style={{
-          display: 'flex',
-          'justify-content': 'space-between',
-          'align-items': 'center',
-        }}
-      >
-        <h1>Admin Dashboard</h1>
-        <button onClick={handleLogout}>Logout</button>
+    <div class="max-w-6xl mx-auto space-y-8">
+      <div>
+        <h2 class="text-3xl font-bold tracking-tight">Dashboard</h2>
+        <p class="text-muted-foreground mt-2">Manage your short links and track their performance.</p>
       </div>
 
-      <div
-        style={{
-          background: '#f5f5f5',
-          padding: '1.5rem',
-          'border-radius': '8px',
-          'margin-top': '1rem',
-        }}
-      >
-        <h2>Create Short Link</h2>
+      <Card>
+        <CardHeader>
+          <CardTitle>Create Short Link</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Show when={formError()}>
+            <div class="mb-4 p-3 text-sm text-red-400 bg-red-950/50 border border-red-900/50 rounded-md">
+              {formError()}
+            </div>
+          </Show>
 
-        <Show when={formError()}>
-          <p style={{ color: 'red', margin: '0 0 1rem 0' }}>{formError()}</p>
-        </Show>
+          <form onSubmit={handleCreateLink} class="flex flex-col md:flex-row gap-4 items-end">
+            <div class="flex-1 w-full space-y-2">
+              <label class="text-sm font-medium leading-none">Original URL <span class="text-red-500">*</span></label>
+              <Input
+                type="url"
+                value={originalUrl()}
+                onInput={(e) => setOriginalUrl(e.currentTarget.value)}
+                placeholder="https://example.com/very/long/path/to/something"
+                required
+              />
+            </div>
 
-        <form
-          onSubmit={handleCreateLink}
-          style={{ display: 'flex', gap: '1rem', 'align-items': 'flex-end' }}
-        >
-          <div style={{ flex: 2 }}>
-            <label style={{ display: 'block', 'margin-bottom': '0.5rem' }}>
-              Original URL *
-            </label>
-            <input
-              type="url"
-              value={originalUrl()}
-              onInput={(e) => setOriginalUrl(e.currentTarget.value)}
-              placeholder="https://example.com"
-              required
-              style={{ width: '100%', padding: '0.5rem' }}
-            />
-          </div>
+            <div class="flex-1 w-full space-y-2">
+              <label class="text-sm font-medium leading-none">Title (Optional)</label>
+              <Input
+                type="text"
+                value={title()}
+                onInput={(e) => setTitle(e.currentTarget.value)}
+                placeholder="My awesome link"
+              />
+            </div>
 
-          <div style={{ flex: 1 }}>
-            <label style={{ display: 'block', 'margin-bottom': '0.5rem' }}>
-              Title (Optional)
-            </label>
-            <input
-              type="text"
-              value={title()}
-              onInput={(e) => setTitle(e.currentTarget.value)}
-              placeholder="My awesome link"
-              style={{ width: '100%', padding: '0.5rem' }}
-            />
-          </div>
+            <Button type="submit" disabled={isCreating()} class="w-full md:w-auto h-10 cursor-pointer">
+              {isCreating() ? 'Creating...' : 'Create Link'}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
 
-          <button
-            type="submit"
-            disabled={isCreating()}
-            style={{ padding: '0.5rem 1rem', height: 'fit-content' }}
+      <Card>
+        <CardHeader>
+          <CardTitle>Your Links</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Show when={links.loading}>
+            <div class="flex items-center justify-center py-8">
+              <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </div>
+          </Show>
+
+          <ErrorBoundary
+            fallback={(err) => (
+              <div class="p-4 text-red-400 bg-red-950/50 border border-red-900/50 rounded-md mt-4">
+                <p>Error: {err.message}</p>
+                <Button variant="primary" size="sm" onClick={() => refetch()} class="mt-4 border-red-900/50 hover:bg-red-900/50">
+                  Try Again
+                </Button>
+              </div>
+            )}
           >
-            {isCreating() ? 'Creating...' : 'Create Link'}
-          </button>
-        </form>
-      </div>
+            <Show when={links()}>
+              <div class="rounded-md border border-border overflow-hidden">
+                <table class="w-full text-sm text-left">
+                  <thead class="text-xs text-muted-foreground bg-muted/50 border-b border-border uppercase">
+                    <tr>
+                      <th class="px-6 py-3 font-medium">Title</th>
+                      <th class="px-6 py-3 font-medium">Short URL</th>
+                      <th class="px-6 py-3 font-medium hidden md:table-cell">Original URL</th>
+                      <th class="px-6 py-3 font-medium text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <For each={links()}>
+                      {(link) => (
+                        <tr class="bg-card border-b border-border hover:bg-muted/30 transition-colors">
+                          <td class="px-6 py-4 font-medium text-foreground">
+                            {link.title || 'Untitled'}
+                          </td>
+                          <td class="px-6 py-4">
+                            <a
+                              href={`http://localhost:3000/api/links/${link.shortCode}`}
+                              target="_blank"
+                              class="text-primary hover:underline font-medium"
+                            >
+                              {link.shortCode}
+                            </a>
+                          </td>
+                          <td class="px-6 py-4 text-muted-foreground truncate max-w-xs hidden md:table-cell" title={link.originalUrl}>
+                            {link.originalUrl}
+                          </td>
+                          <td class="px-6 py-4 text-right">
+                            <A href={`/dashboard/analytics/${link.id}`}>
+                              <Button variant="secondary" size="sm" class="cursor-pointer">
+                                Analytics
+                              </Button>
+                            </A>
+                          </td>
+                        </tr>
+                      )}
+                    </For>
 
-      {/* Loading state */}
-      <Show when={links.loading}>
-        <p>Loading links...</p>
-      </Show>
-
-      {/* Error state */}
-      <ErrorBoundary
-        fallback={(err) => (
-          <div
-            style={{
-              padding: '1rem',
-              background: '#ffebee',
-              'border-radius': '8px',
-              'margin-top': '1rem',
-            }}
-          >
-            <p style={{ color: 'red', margin: 0 }}>Error: {err.message}</p>
-            <button onClick={handleLogout} style={{ 'margin-top': '1rem' }}>
-              Return to Login
-            </button>
-          </div>
-        )}
-      >
-        {/* Render the table when we have data */}
-        <Show when={links()}>
-          <table
-            style={{
-              width: '100%',
-              'margin-top': '2rem',
-              'text-align': 'left',
-            }}
-          >
-            <thead>
-              <tr>
-                <th>Title</th>
-                <th>Short URL</th>
-                <th>Original URL</th>
-              </tr>
-            </thead>
-            <tbody>
-              <For each={links()}>
-                {(link) => (
-                  <tr>
-                    <td style={{ padding: '0.5rem 0' }}>
-                      {link.title || 'Untitled'}
-                    </td>
-                    <td>
-                      <a
-                        href={`http://localhost:3000/api/links/${link.shortCode}`}
-                        target="_blank"
-                      >
-                        {link.shortCode}
-                      </a>
-                    </td>
-                    <td>{link.originalUrl}</td>
-                  </tr>
-                )}
-              </For>
-
-              <Show when={links()?.length === 0}>
-                <tr>
-                  <td colspan="3">No links found! Create one.</td>
-                </tr>
-              </Show>
-            </tbody>
-          </table>
-        </Show>
-      </ErrorBoundary>
+                    <Show when={links()?.length === 0}>
+                      <tr>
+                        <td colspan="4" class="px-6 py-8 text-center text-muted-foreground">
+                          No links found. Create your first short link above!
+                        </td>
+                      </tr>
+                    </Show>
+                  </tbody>
+                </table>
+              </div>
+            </Show>
+          </ErrorBoundary>
+        </CardContent>
+      </Card>
     </div>
   );
 }
