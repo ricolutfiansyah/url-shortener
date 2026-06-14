@@ -1,6 +1,7 @@
 /* @refresh reload */
 import { render } from 'solid-js/web';
 import { Router, Route } from '@solidjs/router';
+import ProtectedRoute from './components/PotectedRoute';
 import 'solid-devtools';
 import './index.css';
 
@@ -27,6 +28,7 @@ if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
 render(
   () => (
     <Router>
+      {/* Public Routes */}
       <Route component={Layout}>
         <Route path="/" component={Home} />
         <Route path="/track" component={Track} />
@@ -34,9 +36,13 @@ render(
         <Route path="/stats/:id" component={Stats} />
       </Route>
       <Route path="/login" component={Login} />
-      
-      {/* Admin Routes wrapped in AdminLayout */}
-      <Route path="/dashboard" component={AdminLayout}>
+
+      {/* Private / Admin Routes */}
+      <Route path="/dashboard" component={(props) => (
+        <ProtectedRoute>
+          <AdminLayout>{props.children}</AdminLayout>
+        </ProtectedRoute>
+      )}>
         <Route path="/" component={Dashboard} />
         <Route path="/analytics/:id" component={Analytics} />
       </Route>
