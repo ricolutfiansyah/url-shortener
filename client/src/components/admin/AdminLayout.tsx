@@ -1,9 +1,23 @@
-import { JSX } from 'solid-js';
+import { JSX, createResource } from 'solid-js';
 import { A, useNavigate } from '@solidjs/router';
 import { Button } from '../ui/Button';
+import { client } from '../../lib/api';
+
+const fetchUser = async () => {
+  const res = await client.api.users['me'].$get();
+  const data = await res.json();
+
+  if (!res.ok && !data.success) {
+    throw new Error(data.message || 'Failed to fetch user');
+  }
+
+  return data.data;
+}
 
 export default function AdminLayout(props: { children?: JSX.Element }) {
   const navigate = useNavigate();
+
+  const [user] = createResource(fetchUser);
 
   const handleLogout = () => {
     localStorage.removeItem('accessToken');
@@ -26,7 +40,6 @@ export default function AdminLayout(props: { children?: JSX.Element }) {
           >
             Links
           </A>
-          {/* Note: Analytics is usually a sub-page, but we can link to it if we want. For now, Links is the main view. */}
         </nav>
         <div class="p-4 border-t border-border">
           <Button variant="ghost" class="w-full justify-start text-muted-foreground hover:text-foreground" onClick={handleLogout}>
@@ -40,13 +53,13 @@ export default function AdminLayout(props: { children?: JSX.Element }) {
         {/* Top Header */}
         <header class="h-16 border-b border-border bg-background flex items-center px-6 justify-between md:justify-end">
           <div class="md:hidden">
-             <h1 class="text-xl font-bold tracking-tight">Admin Panel</h1>
+            <h1 class="text-xl font-bold tracking-tight">Admin Panel</h1>
           </div>
           <div class="flex items-center gap-4">
-             <span class="text-sm text-muted-foreground">Welcome, Admin</span>
-             <Button variant="ghost" size="sm" class="md:hidden" onClick={handleLogout}>
-               Logout
-             </Button>
+            <span class="text-sm text-muted-foreground">Welcome, {user()?.name}</span>
+            <Button variant="ghost" size="sm" class="md:hidden" onClick={handleLogout}>
+              Logout
+            </Button>
           </div>
         </header>
 
