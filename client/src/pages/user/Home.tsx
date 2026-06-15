@@ -23,7 +23,10 @@ export default function Home() {
 
   const handleGenerateQr = async () => {
     try {
-      const imgUrl = await QRCode.toDataURL(shortUrl(), { width: 400, margin: 2 });
+      const imgUrl = await QRCode.toDataURL(shortUrl(), {
+        width: 400,
+        margin: 2,
+      });
       setQrDataUrl(imgUrl);
       setIsQrModalOpen(true);
     } catch (err) {
@@ -164,7 +167,30 @@ export default function Home() {
                   onClick={handleGenerateQr}
                   title="QR Code"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/></svg>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <rect width="5" height="5" x="3" y="3" rx="1" />
+                    <rect width="5" height="5" x="16" y="3" rx="1" />
+                    <rect width="5" height="5" x="3" y="16" rx="1" />
+                    <path d="M21 16h-3a2 2 0 0 0-2 2v3" />
+                    <path d="M21 21v.01" />
+                    <path d="M12 7v3a2 2 0 0 1-2 2H7" />
+                    <path d="M3 12h.01" />
+                    <path d="M12 3h.01" />
+                    <path d="M12 16v.01" />
+                    <path d="M16 12h1" />
+                    <path d="M21 12v.01" />
+                    <path d="M12 21v-1" />
+                  </svg>
                 </button>
               </div>
             </div>
@@ -273,21 +299,25 @@ export default function Home() {
         </div>
       </div>
 
-      <Modal 
-        isOpen={isQrModalOpen()} 
+      <Modal
+        isOpen={isQrModalOpen()}
         onClose={() => setIsQrModalOpen(false)}
         title="QR Code"
       >
         <div class="flex flex-col items-center justify-center gap-6">
           <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 w-max">
-            <img src={qrDataUrl()} alt="QR Code" class="w-64 h-64 object-contain" />
+            <img
+              src={qrDataUrl()}
+              alt="QR Code"
+              class="w-64 h-64 object-contain"
+            />
           </div>
           <div class="w-full text-center">
             <p class="text-sm text-gray-500 truncate w-full mb-4" title={url()}>
               Destination: {url()}
             </p>
-            <a 
-              href={qrDataUrl()} 
+            <a
+              href={qrDataUrl()}
               download="qrcode.png"
               class="w-full inline-block"
             >
