@@ -7,6 +7,8 @@ import {
 } from 'solid-js';
 import { A } from '@solidjs/router';
 import { client } from '../../lib/api';
+import QRCode from 'qrcode';
+import { Modal } from '../../components/ui/Modal';
 import {
   Card,
   CardHeader,
@@ -35,6 +37,22 @@ export default function Dashboard() {
   const [shortCode, setShortCode] = createSignal('');
   const [isCreating, setIsCreating] = createSignal(false);
   const [formError, setFormError] = createSignal('');
+
+  const [isQrModalOpen, setIsQrModalOpen] = createSignal(false);
+  const [qrDataUrl, setQrDataUrl] = createSignal('');
+  const [qrOriginalUrl, setQrOriginalUrl] = createSignal('');
+
+  const handleGenerateQr = async (shortCode: string, originalUrl: string) => {
+    try {
+      const fullUrl = `http://localhost:3000/api/links/${shortCode}`;
+      const url = await QRCode.toDataURL(fullUrl, { width: 400, margin: 2 });
+      setQrDataUrl(url);
+      setQrOriginalUrl(originalUrl);
+      setIsQrModalOpen(true);
+    } catch (err) {
+      console.error('Failed to generate QR code', err);
+    }
+  };
 
   const handleCreateLink = async (e: Event) => {
     e.preventDefault();
@@ -210,16 +228,73 @@ export default function Dashboard() {
                           >
                             {link.originalUrl}
                           </td>
-                          <td class="px-4 py-4">
-                            <A href={`/dashboard/analytics/${link.id}`}>
+                          <td class="px-4 py-4 text-right">
+                            <div class="flex items-center justify-end gap-2">
                               <Button
                                 variant="secondary"
                                 size="sm"
-                                class="cursor-pointer"
+                                class="cursor-pointer px-2 border-border/50 text-muted-foreground hover:text-foreground"
+                                title="QR Code"
+                                onClick={() =>
+                                  handleGenerateQr(
+                                    link.shortCode,
+                                    link.originalUrl,
+                                  )
+                                }
                               >
-                                Analytics
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  width="16"
+                                  height="16"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  stroke-width="2"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                >
+                                  <rect
+                                    width="5"
+                                    height="5"
+                                    x="3"
+                                    y="3"
+                                    rx="1"
+                                  />
+                                  <rect
+                                    width="5"
+                                    height="5"
+                                    x="16"
+                                    y="3"
+                                    rx="1"
+                                  />
+                                  <rect
+                                    width="5"
+                                    height="5"
+                                    x="3"
+                                    y="16"
+                                    rx="1"
+                                  />
+                                  <path d="M21 16h-3a2 2 0 0 0-2 2v3" />
+                                  <path d="M21 21v.01" />
+                                  <path d="M12 7v3a2 2 0 0 1-2 2H7" />
+                                  <path d="M3 12h.01" />
+                                  <path d="M12 3h.01" />
+                                  <path d="M12 16v.01" />
+                                  <path d="M16 12h1" />
+                                  <path d="M21 12v.01" />
+                                  <path d="M12 21v-1" />
+                                </svg>
                               </Button>
-                            </A>
+                              <A href={`/dashboard/analytics/${link.id}`}>
+                                <Button
+                                  variant="secondary"
+                                  size="sm"
+                                  class="cursor-pointer"
+                                >
+                                  Analytics
+                                </Button>
+                              </A>
+                            </div>
                           </td>
                         </tr>
                       )}
@@ -242,6 +317,42 @@ export default function Dashboard() {
           </ErrorBoundary>
         </CardContent>
       </Card>
+
+      <Modal
+        isOpen={isQrModalOpen()}
+        onClose={() => setIsQrModalOpen(false)}
+        title="QR Code"
+      >
+        <div class="flex flex-col items-center justify-center gap-6">
+          <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 dark:border-none w-max">
+            <img
+              src={qrDataUrl()}
+              alt="QR Code"
+              class="w-64 h-64 object-contain"
+            />
+          </div>
+          <div class="w-full text-center">
+            <p
+              class="text-sm text-muted-foreground truncate w-full mb-4"
+              title={qrOriginalUrl()}
+            >
+              Destination: {qrOriginalUrl()}
+            </p>
+            <a
+              href={qrDataUrl()}
+              download="qrcode.png"
+              class="w-full inline-block"
+            >
+              <Button
+                variant="primary"
+                class="w-full cursor-pointer h-11 text-base"
+              >
+                Download PNG
+              </Button>
+            </a>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

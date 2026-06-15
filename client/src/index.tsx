@@ -35,14 +35,18 @@ render(
         <Route path="/unshorten" component={Unshorten} />
         <Route path="/stats/:id" component={Stats} />
       </Route>
+
       <Route path="/login" component={Login} />
 
       {/* Private / Admin Routes */}
-      <Route path="/dashboard" component={(props) => (
-        <ProtectedRoute>
-          <AdminLayout>{props.children}</AdminLayout>
-        </ProtectedRoute>
-      )}>
+      <Route
+        path="/dashboard"
+        component={(props) => (
+          <ProtectedRoute>
+            <AdminLayout>{props.children}</AdminLayout>
+          </ProtectedRoute>
+        )}
+      >
         <Route path="/" component={Dashboard} />
         <Route path="/analytics/:id" component={Analytics} />
       </Route>

@@ -1,5 +1,7 @@
 import { createSignal, Show } from 'solid-js';
 import { client } from '../../lib/api';
+import QRCode from 'qrcode';
+import { Modal } from '../../components/ui/Modal';
 
 type HistoryItem = {
   id: string;
@@ -15,6 +17,19 @@ export default function Home() {
   const [linkId, setLinkId] = createSignal('');
   const [isShortening, setIsShortening] = createSignal(false);
   const [shortenError, setShortenError] = createSignal('');
+
+  const [isQrModalOpen, setIsQrModalOpen] = createSignal(false);
+  const [qrDataUrl, setQrDataUrl] = createSignal('');
+
+  const handleGenerateQr = async () => {
+    try {
+      const imgUrl = await QRCode.toDataURL(shortUrl(), { width: 400, margin: 2 });
+      setQrDataUrl(imgUrl);
+      setIsQrModalOpen(true);
+    } catch (err) {
+      console.error('Failed to generate QR code', err);
+    }
+  };
 
   const handleShorten = async (e: Event) => {
     e.preventDefault();
@@ -137,12 +152,21 @@ export default function Home() {
               >
                 {shortUrl()}
               </a>
-              <button
-                class="bg-white border border-blue-200 hover:bg-blue-100 text-blue-700 font-medium py-2 px-6 rounded-lg text-sm transition-colors shadow-sm"
-                onClick={copyToClipboard}
-              >
-                Copy
-              </button>
+              <div class="flex items-center gap-2">
+                <button
+                  class="bg-white border border-blue-200 hover:bg-blue-100 text-blue-700 font-medium py-2 px-6 rounded-lg text-sm transition-colors shadow-sm cursor-pointer"
+                  onClick={copyToClipboard}
+                >
+                  Copy
+                </button>
+                <button
+                  class="bg-white border border-blue-200 hover:bg-blue-100 text-blue-700 font-medium py-2 px-3 rounded-lg text-sm transition-colors shadow-sm cursor-pointer flex items-center justify-center"
+                  onClick={handleGenerateQr}
+                  title="QR Code"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/></svg>
+                </button>
+              </div>
             </div>
             <a
               href={`/stats/${linkId()}`}
@@ -248,6 +272,32 @@ export default function Home() {
           </p>
         </div>
       </div>
+
+      <Modal 
+        isOpen={isQrModalOpen()} 
+        onClose={() => setIsQrModalOpen(false)}
+        title="QR Code"
+      >
+        <div class="flex flex-col items-center justify-center gap-6">
+          <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 w-max">
+            <img src={qrDataUrl()} alt="QR Code" class="w-64 h-64 object-contain" />
+          </div>
+          <div class="w-full text-center">
+            <p class="text-sm text-gray-500 truncate w-full mb-4" title={url()}>
+              Destination: {url()}
+            </p>
+            <a 
+              href={qrDataUrl()} 
+              download="qrcode.png"
+              class="w-full inline-block"
+            >
+              <button class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl transition-colors shadow-sm cursor-pointer">
+                Download PNG
+              </button>
+            </a>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

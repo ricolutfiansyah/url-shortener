@@ -1,33 +1,34 @@
-import { Hono } from "hono";
-import { analyticsService } from "./analytics.service";
-import { authMiddleware, requireAdmin } from "../../middlewares/auth";
+import { Hono } from 'hono';
+import { analyticsService } from './analytics.service';
 
-const app = new Hono()
+const app = new Hono();
 
-const analyticsRoutes = app
-    .get('/:linkId', authMiddleware, requireAdmin, async (c) => {
-        const linkId = c.req.param('linkId')
+const analyticsRoutes = app.get('/:linkId', async (c) => {
+  const linkId = c.req.param('linkId');
 
-        if (!linkId) {
-            return c.json({ success: false, message: 'Link ID is required' }, 400)
-        }
+  if (!linkId) {
+    return c.json({ success: false, message: 'Link ID is required' }, 400);
+  }
 
-        try {
-            const stats = await analyticsService.getLinkStats(linkId)
+  try {
+    const stats = await analyticsService.getLinkStats(linkId);
 
-            if (!stats) {
-                return c.json({ success: false, message: 'Link not found' }, 404)
-            }
+    if (!stats) {
+      return c.json({ success: false, message: 'Link not found' }, 404);
+    }
 
-            return c.json({
-                success: true,
-                message: 'Fetch analytics stats successfully!',
-                data: stats
-            }, 200)
-        } catch (error) {
-            console.error('Failed to get analytics stats!', error)
-            return c.json({ success: false, message: 'Internal server error' }, 500)
-        }
-    })
+    return c.json(
+      {
+        success: true,
+        message: 'Fetch analytics stats successfully!',
+        data: stats,
+      },
+      200,
+    );
+  } catch (error) {
+    console.error('Failed to get analytics stats!', error);
+    return c.json({ success: false, message: 'Internal server error' }, 500);
+  }
+});
 
-export default analyticsRoutes
+export default analyticsRoutes;
