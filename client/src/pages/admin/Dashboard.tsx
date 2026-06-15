@@ -7,7 +7,12 @@ import {
 } from 'solid-js';
 import { A } from '@solidjs/router';
 import { client } from '../../lib/api';
-import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+} from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 
@@ -27,6 +32,7 @@ export default function Dashboard() {
 
   const [originalUrl, setOriginalUrl] = createSignal('');
   const [title, setTitle] = createSignal('');
+  const [shortCode, setShortCode] = createSignal('');
   const [isCreating, setIsCreating] = createSignal(false);
   const [formError, setFormError] = createSignal('');
 
@@ -40,6 +46,7 @@ export default function Dashboard() {
         json: {
           originalUrl: originalUrl(),
           title: title() || undefined,
+          shortCode: shortCode() || undefined,
         },
       });
 
@@ -52,6 +59,7 @@ export default function Dashboard() {
 
       setOriginalUrl('');
       setTitle('');
+      setShortCode('');
 
       refetch();
     } catch (error) {
@@ -65,7 +73,9 @@ export default function Dashboard() {
     <div class="max-w-6xl mx-auto space-y-8">
       <div>
         <h2 class="text-3xl font-bold tracking-tight">Dashboard</h2>
-        <p class="text-muted-foreground mt-2">Manage your short links and track their performance.</p>
+        <p class="text-muted-foreground mt-2">
+          Manage your short links and track their performance.
+        </p>
       </div>
 
       <Card>
@@ -79,9 +89,14 @@ export default function Dashboard() {
             </div>
           </Show>
 
-          <form onSubmit={handleCreateLink} class="flex flex-col md:flex-row gap-4 items-end">
+          <form
+            onSubmit={handleCreateLink}
+            class="flex flex-col md:flex-row gap-4 items-end"
+          >
             <div class="flex-1 w-full space-y-2">
-              <label class="text-sm font-medium leading-none">Original URL <span class="text-red-500">*</span></label>
+              <label class="text-sm font-medium leading-none">
+                Original URL <span class="text-red-500">*</span>
+              </label>
               <Input
                 type="url"
                 value={originalUrl()}
@@ -92,7 +107,21 @@ export default function Dashboard() {
             </div>
 
             <div class="flex-1 w-full space-y-2">
-              <label class="text-sm font-medium leading-none">Title (Optional)</label>
+              <label class="text-sm font-medium leading-none">
+                Custom Alias (Optional)
+              </label>
+              <Input
+                type="text"
+                value={shortCode()}
+                onInput={(e) => setShortCode(e.currentTarget.value)}
+                placeholder="e.g. my-portfolio"
+              />
+            </div>
+
+            <div class="flex-1 w-full space-y-2">
+              <label class="text-sm font-medium leading-none">
+                Title (Optional)
+              </label>
               <Input
                 type="text"
                 value={title()}
@@ -101,7 +130,11 @@ export default function Dashboard() {
               />
             </div>
 
-            <Button type="submit" disabled={isCreating()} class="w-full md:w-auto h-10 cursor-pointer">
+            <Button
+              type="submit"
+              disabled={isCreating()}
+              class="w-full md:w-auto h-10 cursor-pointer"
+            >
               {isCreating() ? 'Creating...' : 'Create Link'}
             </Button>
           </form>
@@ -123,7 +156,12 @@ export default function Dashboard() {
             fallback={(err) => (
               <div class="p-4 text-red-400 bg-red-950/50 border border-red-900/50 rounded-md mt-4">
                 <p>Error: {err.message}</p>
-                <Button variant="primary" size="sm" onClick={() => refetch()} class="mt-4 border-red-900/50 hover:bg-red-900/50">
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={() => refetch()}
+                  class="mt-4 border-red-900/50 hover:bg-red-900/50"
+                >
                   Try Again
                 </Button>
               </div>
@@ -136,7 +174,9 @@ export default function Dashboard() {
                     <tr>
                       <th class="px-6 py-3 font-medium">Title</th>
                       <th class="px-6 py-3 font-medium">Short URL</th>
-                      <th class="px-6 py-3 font-medium hidden md:table-cell">Original URL</th>
+                      <th class="px-6 py-3 font-medium hidden md:table-cell">
+                        Original URL
+                      </th>
                       <th class="px-6 py-3 font-medium">Actions</th>
                     </tr>
                   </thead>
@@ -148,7 +188,10 @@ export default function Dashboard() {
                             <div class="font-medium text-foreground">
                               {link.title || 'Untitled'}
                             </div>
-                            <div class="text-xs text-muted-foreground truncate max-w-[150px] sm:max-w-[250px] md:hidden mt-1" title={link.originalUrl}>
+                            <div
+                              class="text-xs text-muted-foreground truncate max-w-37.5 sm:max-w-62.5 md:hidden mt-1"
+                              title={link.originalUrl}
+                            >
                               {link.originalUrl}
                             </div>
                           </td>
@@ -161,12 +204,19 @@ export default function Dashboard() {
                               {link.shortCode}
                             </a>
                           </td>
-                          <td class="px-4 py-4 text-muted-foreground truncate max-w-[200px] lg:max-w-xs hidden md:table-cell" title={link.originalUrl}>
+                          <td
+                            class="px-4 py-4 text-muted-foreground truncate max-w-50 lg:max-w-xs hidden md:table-cell"
+                            title={link.originalUrl}
+                          >
                             {link.originalUrl}
                           </td>
                           <td class="px-4 py-4">
                             <A href={`/dashboard/analytics/${link.id}`}>
-                              <Button variant="secondary" size="sm" class="cursor-pointer">
+                              <Button
+                                variant="secondary"
+                                size="sm"
+                                class="cursor-pointer"
+                              >
                                 Analytics
                               </Button>
                             </A>
@@ -177,7 +227,10 @@ export default function Dashboard() {
 
                     <Show when={links()?.length === 0}>
                       <tr>
-                        <td colspan="4" class="px-6 py-8 text-center text-muted-foreground">
+                        <td
+                          colspan="4"
+                          class="px-6 py-8 text-center text-muted-foreground"
+                        >
                           No links found. Create your first short link above!
                         </td>
                       </tr>

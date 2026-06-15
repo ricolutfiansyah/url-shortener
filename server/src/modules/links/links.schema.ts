@@ -25,6 +25,12 @@ export const linkSchema = z.object({
         .string()
         .max(50, 'Title must be at most 50 characters long.')
         .optional(),
+    shortCode: z
+        .string()
+        .min(3, 'Custom alias must be at least 3 characters.')
+        .max(30, 'Custom alias must be at most 30 characters.')
+        .regex(/^[a-zA-Z0-9_-]+$/, 'Alias can only contain letters, numbers, hyphens, and underscores.')
+        .optional(),
     userId: z.string().optional(),
     expiresAt: z.coerce.date().optional(),
 }).superRefine((data, ctx) => {

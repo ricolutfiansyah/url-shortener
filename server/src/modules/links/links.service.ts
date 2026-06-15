@@ -8,7 +8,19 @@ import { HTTPException } from "hono/http-exception"
 export const linksService = {
     async createShortUrl(data: LinkSchema) {
 
-        let shortCode = nanoid(8)
+        let shortCode = data.shortCode || nanoid(8)
+
+        const existingLink = await db.query.links.findFirst({
+            where: eq(links.shortCode, shortCode)
+        })
+
+        if (existingLink) {
+            if (data.shortCode) {
+                throw new HTTPException(400, { message: 'This custom alias is already taken!' })
+            } else {
+                throw new HTTPException(500, { message: 'A code collision occurred, please try again.' })
+            }
+        }
 
         const [newLink] = await db.insert(links).values({
             originalUrl: data.originalUrl,
