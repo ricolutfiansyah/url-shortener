@@ -84,7 +84,7 @@ export default function Dashboard() {
         </CardHeader>
         <CardContent>
           <Show when={formError()}>
-            <div class="mb-4 p-3 text-sm text-red-400 bg-red-950/50 border border-red-900/50 rounded-md">
+            <div class="mb-4 p-3 text-sm text-red-400 bg-red-950/50 border border-red-900/50 text-center rounded-md">
               {formError()}
             </div>
           </Show>
