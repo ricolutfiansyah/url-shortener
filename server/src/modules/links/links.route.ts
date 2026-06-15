@@ -85,5 +85,14 @@ const linkRoutes = app
 
         return c.redirect(link.originalUrl, 302)
     })
+    .delete('/:id', authMiddleware, requireAdmin, async (c) => {
+        const id = c.req.param('id')
+        await linksService.deleteLink(id)
+
+        return c.json({
+            success: true,
+            message: 'Link deleted successfully!'
+        })
+    })
 
 export default linkRoutes

@@ -35,6 +35,7 @@ export default function Dashboard() {
   const [originalUrl, setOriginalUrl] = createSignal('');
   const [title, setTitle] = createSignal('');
   const [shortCode, setShortCode] = createSignal('');
+  const [expireOption, setExpireOption] = createSignal('never');
   const [isCreating, setIsCreating] = createSignal(false);
   const [formError, setFormError] = createSignal('');
 
@@ -59,12 +60,26 @@ export default function Dashboard() {
     setFormError('');
     setIsCreating(true);
 
+    let expiresAt: string | undefined = undefined;
+    const opt = expireOption();
+    const now = new Date();
+
+    if (opt === '1h')
+      expiresAt = new Date(now.getTime() + 1000 * 60 * 60).toISOString();
+    else if (opt === '24h')
+      expiresAt = new Date(now.getTime() + 1000 * 60 * 60 * 24).toISOString();
+    else if (opt === '7d')
+      expiresAt = new Date(
+        now.getTime() + 1000 * 60 * 60 * 24 * 7,
+      ).toISOString();
+
     try {
       const res = await client.api.links.$post({
         json: {
           originalUrl: originalUrl(),
           title: title() || undefined,
           shortCode: shortCode() || undefined,
+          expiresAt,
         },
       });
 
@@ -78,12 +93,23 @@ export default function Dashboard() {
       setOriginalUrl('');
       setTitle('');
       setShortCode('');
+      setExpireOption('never');
 
       refetch();
     } catch (error) {
       setFormError('Network error occured while creating url');
     } finally {
       setIsCreating(false);
+    }
+  };
+
+  const handleDeleteLink = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this link?')) return;
+    try {
+      const res = await client.api.links[':id'].$delete({ param: { id } });
+      if (res.ok) refetch();
+    } catch (error) {
+      console.error('Failed to delete link', error);
     }
   };
 
@@ -109,7 +135,7 @@ export default function Dashboard() {
 
           <form
             onSubmit={handleCreateLink}
-            class="flex flex-col md:flex-row gap-4 items-end"
+            class="flex flex-col lg:flex-row gap-4 items-start"
           >
             <div class="flex-1 w-full space-y-2">
               <label class="text-sm font-medium leading-none">
@@ -148,13 +174,49 @@ export default function Dashboard() {
               />
             </div>
 
-            <Button
-              type="submit"
-              disabled={isCreating()}
-              class="w-full md:w-auto h-10 cursor-pointer"
-            >
-              {isCreating() ? 'Creating...' : 'Create Link'}
-            </Button>
+            <div class="flex-1 w-full space-y-2">
+              <label class="text-sm font-medium leading-none">Expiration</label>
+              <select
+                class="flex h-10 w-full rounded-md border border-input bg-transparent pl-3 pr-8 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23a1a1aa%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-no-repeat bg-position-[right_0.75rem_center] bg-size-[1em_1em] cursor-pointer"
+                value={expireOption()}
+                onChange={(e) => setExpireOption(e.currentTarget.value)}
+              >
+                <option
+                  class="bg-background text-foreground cursor-pointer"
+                  value="never"
+                >
+                  Never
+                </option>
+                <option
+                  class="bg-background text-foreground cursor-pointer"
+                  value="1h"
+                >
+                  1 Hour
+                </option>
+                <option
+                  class="bg-background text-foreground cursor-pointer"
+                  value="24h"
+                >
+                  24 Hours
+                </option>
+                <option
+                  class="bg-background text-foreground cursor-pointer"
+                  value="7d"
+                >
+                  7 Days
+                </option>
+              </select>
+            </div>
+
+            <div class="w-full lg:w-auto pt-5.5">
+              <Button
+                type="submit"
+                disabled={isCreating()}
+                class="w-full h-10 cursor-pointer"
+              >
+                {isCreating() ? 'Creating...' : 'Create Link'}
+              </Button>
+            </div>
           </form>
         </CardContent>
       </Card>
@@ -188,14 +250,15 @@ export default function Dashboard() {
             <Show when={links()}>
               <div class="rounded-md border border-border overflow-hidden">
                 <table class="w-full text-sm text-left">
-                  <thead class="text-xs text-muted-foreground bg-muted/50 border-b border-border uppercase">
+                  <thead class="text-xs text-muted-foreground bg-muted/50 border-b border-border uppercase text-left">
                     <tr>
-                      <th class="px-6 py-3 font-medium">Title</th>
-                      <th class="px-6 py-3 font-medium">Short URL</th>
-                      <th class="px-6 py-3 font-medium hidden md:table-cell">
+                      <th class="px-4 py-3 font-medium">Title</th>
+                      <th class="px-4 py-3 font-medium">Short URL</th>
+                      <th class="px-4 py-3 font-medium hidden md:table-cell">
                         Original URL
                       </th>
-                      <th class="px-6 py-3 font-medium">Actions</th>
+                      <th class="px-4 py-3 font-medium">Status</th>
+                      <th class="px-4 py-3 pl-18.5 font-medium">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -227,6 +290,18 @@ export default function Dashboard() {
                             title={link.originalUrl}
                           >
                             {link.originalUrl}
+                          </td>
+                          <td class="px-4 py-4">
+                            {link.expiresAt &&
+                            new Date(link.expiresAt) < new Date() ? (
+                              <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400">
+                                Expired
+                              </span>
+                            ) : (
+                              <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                                Active
+                              </span>
+                            )}
                           </td>
                           <td class="px-4 py-4 text-right">
                             <div class="flex items-center justify-end gap-2">
@@ -294,6 +369,31 @@ export default function Dashboard() {
                                   Analytics
                                 </Button>
                               </A>
+                              <Button
+                                variant="secondary"
+                                size="sm"
+                                class="cursor-pointer px-2 border-red-900/50 text-red-500 hover:bg-red-900/20"
+                                title="Delete Link"
+                                onClick={() => handleDeleteLink(link.id)}
+                              >
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  width="16"
+                                  height="16"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  stroke-width="2"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                >
+                                  <path d="M3 6h18" />
+                                  <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                                  <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                                  <line x1="10" x2="10" y1="11" y2="17" />
+                                  <line x1="14" x2="14" y1="11" y2="17" />
+                                </svg>
+                              </Button>
                             </div>
                           </td>
                         </tr>
@@ -303,8 +403,8 @@ export default function Dashboard() {
                     <Show when={links()?.length === 0}>
                       <tr>
                         <td
-                          colspan="4"
-                          class="px-6 py-8 text-center text-muted-foreground"
+                          colspan="5"
+                          class="px-4 py-8 text-center text-muted-foreground"
                         >
                           No links found. Create your first short link above!
                         </td>

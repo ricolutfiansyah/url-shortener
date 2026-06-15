@@ -1,7 +1,12 @@
 import { createResource, Show, For } from 'solid-js';
-import { useParams, A } from '@solidjs/router';
+import { useParams, useNavigate } from '@solidjs/router';
 import { client } from '../../lib/api';
-import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+} from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 
 const fetchAnalytics = async (linkId: string) => {
@@ -19,21 +24,40 @@ const fetchAnalytics = async (linkId: string) => {
 
 export default function Analytics() {
   const params = useParams();
+  const navigate = useNavigate();
 
   const [analytics] = createResource(() => params.id, fetchAnalytics);
 
   return (
     <div class="max-w-6xl mx-auto space-y-8">
       <div class="flex items-center gap-4">
-        <A href="/dashboard">
-          <Button variant="ghost" size="sm" class="pl-2 pr-4 cursor-pointer">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="m15 18-6-6 6-6" /></svg>
-            Back
-          </Button>
-        </A>
+        <Button
+          onclick={() => navigate(-1)}
+          variant="ghost"
+          size="sm"
+          class="pl-2 pr-4 cursor-pointer"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="mr-2"
+          >
+            <path d="m15 18-6-6 6-6" />
+          </svg>
+          Back
+        </Button>
         <div>
           <h2 class="text-3xl font-bold tracking-tight">Link Analytics</h2>
-          <p class="text-muted-foreground mt-1">Detailed click statistics for your link</p>
+          <p class="text-muted-foreground mt-1">
+            Detailed click statistics for your link
+          </p>
         </div>
       </div>
 
@@ -51,11 +75,12 @@ export default function Analytics() {
 
       <Show when={analytics()}>
         <div class="grid gap-6 md:grid-cols-3">
-
           {/* Total Clicks Card */}
           <Card class="md:col-span-3 lg:col-span-1 border-primary/20 bg-primary/5">
             <CardHeader class="pb-2">
-              <CardTitle class="text-lg font-medium text-muted-foreground">Total Clicks</CardTitle>
+              <CardTitle class="text-lg font-medium text-muted-foreground">
+                Total Clicks
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div class="text-5xl font-bold">{analytics()?.totalClicks}</div>
@@ -68,18 +93,37 @@ export default function Analytics() {
               <CardTitle>Browser Distribution</CardTitle>
             </CardHeader>
             <CardContent class="space-y-4">
-              <Show when={(analytics()?.browser?.length || 0) > 0} fallback={<p class="text-muted-foreground text-sm">No data available.</p>}>
+              <Show
+                when={(analytics()?.browser?.length || 0) > 0}
+                fallback={
+                  <p class="text-muted-foreground text-sm">
+                    No data available.
+                  </p>
+                }
+              >
                 <For each={analytics()?.browser}>
                   {(item) => (
                     <div class="space-y-1">
                       <div class="flex items-center justify-between text-sm">
-                        <span class="font-medium">{item.name || 'Unknown'}</span>
-                        <span class="text-muted-foreground">{item.count} ({Math.round((item.count / Math.max(analytics()?.totalClicks || 1, 1)) * 100)}%)</span>
+                        <span class="font-medium">
+                          {item.name || 'Unknown'}
+                        </span>
+                        <span class="text-muted-foreground">
+                          {item.count} (
+                          {Math.round(
+                            (item.count /
+                              Math.max(analytics()?.totalClicks || 1, 1)) *
+                              100,
+                          )}
+                          %)
+                        </span>
                       </div>
                       <div class="h-2 w-full bg-muted rounded-full overflow-hidden">
                         <div
                           class="h-full bg-primary"
-                          style={{ width: `${(item.count / Math.max(analytics()?.totalClicks || 1, 1)) * 100}%` }}
+                          style={{
+                            width: `${(item.count / Math.max(analytics()?.totalClicks || 1, 1)) * 100}%`,
+                          }}
                         ></div>
                       </div>
                     </div>
@@ -95,18 +139,37 @@ export default function Analytics() {
               <CardTitle>Platform Distribution</CardTitle>
             </CardHeader>
             <CardContent class="space-y-4">
-              <Show when={(analytics()?.platform?.length || 0) > 0} fallback={<p class="text-muted-foreground text-sm">No data available.</p>}>
+              <Show
+                when={(analytics()?.platform?.length || 0) > 0}
+                fallback={
+                  <p class="text-muted-foreground text-sm">
+                    No data available.
+                  </p>
+                }
+              >
                 <For each={analytics()?.platform}>
                   {(item) => (
                     <div class="space-y-1">
                       <div class="flex items-center justify-between text-sm">
-                        <span class="font-medium">{item.name || 'Unknown'}</span>
-                        <span class="text-muted-foreground">{item.total} ({Math.round((item.total / Math.max(analytics()?.totalClicks || 1, 1)) * 100)}%)</span>
+                        <span class="font-medium">
+                          {item.name || 'Unknown'}
+                        </span>
+                        <span class="text-muted-foreground">
+                          {item.total} (
+                          {Math.round(
+                            (item.total /
+                              Math.max(analytics()?.totalClicks || 1, 1)) *
+                              100,
+                          )}
+                          %)
+                        </span>
                       </div>
                       <div class="h-2 w-full bg-muted rounded-full overflow-hidden">
                         <div
                           class="h-full bg-primary"
-                          style={{ width: `${(item.total / Math.max(analytics()?.totalClicks || 1, 1)) * 100}%` }}
+                          style={{
+                            width: `${(item.total / Math.max(analytics()?.totalClicks || 1, 1)) * 100}%`,
+                          }}
                         ></div>
                       </div>
                     </div>
@@ -115,7 +178,6 @@ export default function Analytics() {
               </Show>
             </CardContent>
           </Card>
-
         </div>
       </Show>
     </div>
