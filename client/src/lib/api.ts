@@ -38,18 +38,14 @@ export const client = hc<AppType>(API_URL, {
       !urlStr.includes('/refresh')
     ) {
       try {
-        const refreshRes = await fetch(
-          `${API_URL}/api/users/refresh`,
-          {
-            method: 'POST',
-            credentials: 'include',
-          },
-        );
+        const refreshRes = await fetch(`${API_URL}/api/users/refresh`, {
+          method: 'POST',
+          credentials: 'include',
+        });
 
         if (refreshRes.ok) {
           const refreshData = await refreshRes.json();
           if (refreshData.success && refreshData.accessToken) {
-            // Store in signal instead of localStorage
             setAccessToken(refreshData.accessToken);
             response = await fetch(input, getFetchConfig());
           } else {
