@@ -1,5 +1,5 @@
 import { createResource, Show, For, ErrorBoundary } from 'solid-js';
-import { useParams, A } from '@solidjs/router';
+import { useParams, A, useNavigate } from '@solidjs/router';
 import { client } from '../../lib/api';
 
 const fetchStats = async (id: string) => {
@@ -17,6 +17,7 @@ const fetchStats = async (id: string) => {
 };
 
 export default function Stats() {
+  const navigate = useNavigate();
   const params = useParams();
   const [stats, { refetch }] = createResource(() => params.id, fetchStats);
 
@@ -31,9 +32,12 @@ export default function Stats() {
         >
           {stats.loading ? 'Refreshing...' : 'Refresh 🔄'}
         </button>
-        <A href="/" class="text-blue-600 hover:underline font-medium">
-          ← Back to Home
-        </A>
+        <button
+          onclick={() => navigate(-1)}
+          class="text-blue-600 hover:underline font-medium cursor-pointer"
+        >
+          ← Back to Track
+        </button>
       </div>
 
       <Show when={stats.loading}>
