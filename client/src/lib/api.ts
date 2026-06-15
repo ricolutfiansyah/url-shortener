@@ -2,7 +2,9 @@ import { hc } from 'hono/client';
 import type { AppType } from '../../../server/src/index';
 import { accessToken, setAccessToken } from '../store/auth';
 
-export const client = hc<AppType>('http://localhost:3000', {
+export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
+export const client = hc<AppType>(API_URL, {
   fetch: async (input: RequestInfo | URL, requestInit?: RequestInit) => {
     const getFetchConfig = () => {
       const token = accessToken();
@@ -37,7 +39,7 @@ export const client = hc<AppType>('http://localhost:3000', {
     ) {
       try {
         const refreshRes = await fetch(
-          'http://localhost:3000/api/users/refresh',
+          `${API_URL}/api/users/refresh`,
           {
             method: 'POST',
             credentials: 'include',

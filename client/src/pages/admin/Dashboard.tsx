@@ -6,7 +6,7 @@ import {
   createSignal,
 } from 'solid-js';
 import { A } from '@solidjs/router';
-import { client } from '../../lib/api';
+import { client, API_URL } from '../../lib/api';
 import QRCode from 'qrcode';
 import { Modal } from '../../components/ui/Modal';
 import {
@@ -45,7 +45,7 @@ export default function Dashboard() {
 
   const handleGenerateQr = async (shortCode: string, originalUrl: string) => {
     try {
-      const fullUrl = `http://localhost:3000/api/links/${shortCode}`;
+      const fullUrl = `${API_URL}/api/links/${shortCode}`;
       const url = await QRCode.toDataURL(fullUrl, { width: 400, margin: 2 });
       setQrDataUrl(url);
       setQrOriginalUrl(originalUrl);
@@ -278,7 +278,7 @@ export default function Dashboard() {
                           </td>
                           <td class="px-4 py-4">
                             <a
-                              href={`http://localhost:3000/api/links/${link.shortCode}`}
+                              href={`${API_URL}/api/links/${link.shortCode}`}
                               target="_blank"
                               class="text-primary hover:underline font-medium"
                             >

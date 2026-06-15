@@ -1,5 +1,5 @@
 import { createSignal, Show } from 'solid-js';
-import { client } from '../../lib/api';
+import { client, API_URL } from '../../lib/api';
 import QRCode from 'qrcode';
 import { Modal } from '../../components/ui/Modal';
 
@@ -63,7 +63,7 @@ export default function Home() {
         return;
       }
 
-      const newShortUrl = `http://localhost:3000/api/links/${data.data.shortCode}`;
+      const newShortUrl = `${API_URL}/api/links/${data.data.shortCode}`;
       setShortUrl(newShortUrl);
       setLinkId(data.data.id);
 
