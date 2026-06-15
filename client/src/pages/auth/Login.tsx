@@ -1,8 +1,14 @@
 import { createSignal, Show } from 'solid-js';
 import { useNavigate } from '@solidjs/router';
 import { client } from '../../lib/api';
-import { setAccessToken } from '../../store/auth';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../../components/ui/Card';
+import { setAccessToken, setIsAuthLoading } from '../../store/auth';
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 
@@ -35,11 +41,12 @@ export default function Login() {
       }
 
       if (!data.success) {
-        setError(data.message || 'Login failed');
+        setError('Login failed');
         return;
       }
 
       setAccessToken(data.accessToken);
+      setIsAuthLoading(false);
       navigate('/dashboard');
     } catch (error) {
       console.error(error);
@@ -55,8 +62,12 @@ export default function Login() {
 
       <Card class="w-full max-w-md z-10 shadow-2xl border-border/50 bg-card/80 backdrop-blur-sm">
         <CardHeader class="space-y-2 text-center pb-8">
-          <CardTitle class="text-3xl font-bold tracking-tight">Admin Login</CardTitle>
-          <CardDescription>Enter your credentials to access the dashboard</CardDescription>
+          <CardTitle class="text-3xl font-bold tracking-tight">
+            Admin Login
+          </CardTitle>
+          <CardDescription>
+            Enter your credentials to access the dashboard
+          </CardDescription>
         </CardHeader>
 
         <CardContent>
@@ -68,7 +79,9 @@ export default function Login() {
             </Show>
 
             <div class="space-y-2">
-              <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Email</label>
+              <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                Email
+              </label>
               <Input
                 type="email"
                 value={email()}
@@ -79,7 +92,9 @@ export default function Login() {
             </div>
 
             <div class="space-y-2">
-              <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Password</label>
+              <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                Password
+              </label>
               <Input
                 type="password"
                 value={password()}
@@ -89,7 +104,11 @@ export default function Login() {
               />
             </div>
 
-            <Button type="submit" class="w-full mt-6 cursor-pointer" disabled={isLoading()}>
+            <Button
+              type="submit"
+              class="w-full mt-6 cursor-pointer"
+              disabled={isLoading()}
+            >
               {isLoading() ? 'Authenticating...' : 'Sign In'}
             </Button>
           </form>
