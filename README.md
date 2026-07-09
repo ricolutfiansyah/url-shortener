@@ -37,9 +37,30 @@ Project ini mengusung teknologi modern dengan performa tinggi:
 
 ```text
 url-shortener/
-├── client/       # Aplikasi frontend (Solid.js + Vite)
-├── server/       # Aplikasi backend API (Hono + Bun + PostgreSQL)
-└── README.md     # Dokumentasi utama (file ini)
+├── client/                 # Aplikasi frontend (Solid.js + Vite)
+│   ├── src/
+│   │   ├── components/     # UI Component yang dapat digunakan kembali
+│   │   ├── context/        # Solid.js Context API Providers
+│   │   ├── lib/            # Konfigurasi eksternal (contoh: Hono RPC client)
+│   │   ├── pages/          # File halaman/routing aplikasi
+│   │   ├── store/          # State management global
+│   │   ├── index.css       # Konfigurasi dan import Tailwind CSS
+│   │   └── index.tsx       # Entry point Frontend aplikasi
+│   ├── package.json        
+│   └── vite.config.ts      
+├── server/                 # Aplikasi backend API (Hono + Bun + PostgreSQL)
+│   ├── src/
+│   │   ├── db/             # Konfigurasi koneksi database & Drizzle schemas
+│   │   ├── middlewares/    # Middleware custom (contoh: auth, logger)
+│   │   ├── modules/        # Route dan logic API yang dikelompokkan per fitur
+│   │   ├── types/          # Definisi Type/Interface global untuk backend
+│   │   ├── utils/          # Fungsi utilitas helper (contoh: nanoid generator)
+│   │   └── index.ts        # Entry point Backend (Hono app)
+│   ├── drizzle/            # File hasil generasi migrasi Drizzle ORM
+│   ├── .env                # File Environment local kamu (jangan di-commit)
+│   ├── .env.example        # File template Environment (sebagai patokan variabel)
+│   └── package.json        
+└── README.md               # Dokumentasi utama (file ini)
 ```
 
 ## 💻 Panduan Clone & Instalasi
@@ -72,9 +93,14 @@ cd server
 bun install
 
 # 2. Atur Environment Variables
-# Pastikan kamu memiliki file `.env` yang memuat koneksi database kamu.
-# Contoh isi .env:
-# DATABASE_URL="postgresql://username:password@localhost:5432/nama_database"
+# Duplikat file .env.example menjadi .env
+cp .env.example .env
+
+# Lalu buka file .env dan sesuaikan nilainya (seperti kredensial koneksi database)
+# Nilai default di .env.example sudah cukup sebagai panduan:
+# DATABASE_URL=postgresql://root:password@localhost:5432/urlshortener
+# APP_DOMAIN=localhost:3000
+# dll.
 
 # 3. Jalankan migrasi ke database
 bun run db:generate
