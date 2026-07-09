@@ -1,6 +1,6 @@
 # URL Shortener
 
-Sebuah project URL Shortener *fullstack* yang ringan dan cepat. Project ini terdiri dari bagian **Client** (Frontend) dan **Server** (Backend) yang terpisah, namun terintegrasi secara *end-to-end type-safe* menggunakan Hono RPC. Selain memendekkan URL, project ini juga dilengkapi dengan fitur analitik dan pembuatan QR Code.
+Sebuah project URL Shortener _fullstack_ yang ringan dan cepat. Project ini terdiri dari bagian **Client** (Frontend) dan **Server** (Backend) yang terpisah, namun terintegrasi secara _end-to-end type-safe_ menggunakan Hono RPC. Selain memendekkan URL, project ini juga dilengkapi dengan fitur analitik dan pembuatan QR Code.
 
 ## 🚀 Fitur Utama
 
@@ -14,6 +14,7 @@ Sebuah project URL Shortener *fullstack* yang ringan dan cepat. Project ini terd
 Project ini mengusung teknologi modern dengan performa tinggi:
 
 ### Client (Frontend)
+
 - **Framework:** [Solid.js](https://www.solidjs.com/) (reaktivitas tanpa virtual DOM)
 - **Routing:** `@solidjs/router`
 - **Styling:** Tailwind CSS
@@ -23,12 +24,13 @@ Project ini mengusung teknologi modern dengan performa tinggi:
 - **Bahasa:** TypeScript
 
 ### Server (Backend)
+
 - **Runtime:** [Bun](https://bun.sh/)
 - **Framework Web:** [Hono](https://hono.dev/)
 - **ORM (Database):** Drizzle ORM
 - **Database Driver:** PostgreSQL (`postgres`)
 - **Validasi Data:** Zod & `@hono/zod-validator`
-- **Utilitas Tambahan:** `nanoid` (untuk *generate* ID pendek), `ua-parser-js` (untuk analitik *user-agent*)
+- **Utilitas Tambahan:** `nanoid` (untuk _generate_ ID pendek), `ua-parser-js` (untuk analitik _user-agent_)
 - **Bahasa:** TypeScript
 
 ## 📂 Struktur Project
@@ -43,7 +45,9 @@ url-shortener/
 ## 💻 Panduan Clone & Instalasi
 
 ### Prasyarat
+
 Sebelum memulai, pastikan kamu sudah menginstal perangkat lunak berikut:
+
 - **Git**
 - **[Bun](https://bun.sh/)** (Sangat direkomendasikan karena backend sepenuhnya dirancang menggunakan runtime Bun)
 - **PostgreSQL** (Bisa di lokal atau menggunakan layanan cloud database seperti Supabase/Neon)
@@ -53,7 +57,7 @@ Sebelum memulai, pastikan kamu sudah menginstal perangkat lunak berikut:
 Buka terminal dan jalankan:
 
 ```bash
-git clone <url-repository-kamu>
+git clone https://github.com/ricolutfiansyah/url-shortener.git
 cd url-shortener
 ```
 
@@ -69,7 +73,7 @@ bun install
 
 # 2. Atur Environment Variables
 # Pastikan kamu memiliki file `.env` yang memuat koneksi database kamu.
-# Contoh isi .env: 
+# Contoh isi .env:
 # DATABASE_URL="postgresql://username:password@localhost:5432/nama_database"
 
 # 3. Jalankan migrasi ke database
@@ -79,7 +83,8 @@ bun run db:migrate
 # 4. Jalankan server di mode development
 bun run dev
 ```
-Secara default, API server backend akan berjalan dan siap menerima *request*.
+
+Secara default, API server backend akan berjalan dan siap menerima _request_.
 
 ### 3. Setup Client (Frontend)
 
@@ -95,4 +100,5 @@ bun install
 # 2. Jalankan server development
 bun run dev
 ```
+
 Sekarang buka browser kamu dan akses alamat yang tertera di terminal (biasanya `http://localhost:5173`). Aplikasi Frontend dan Backend sudah berjalan dan saling terhubung!
